@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+
+{% block title %}View QR Codes{% endblock %}
+
+{% block content %}
+
+<style>
+    :root {
+        --primary-bg: #192752;
+        --secondary-bg: #F8CE9F;
+        --accent-color: #723B18;
+        --error-color: #ff6b6b;
+    }
+
+    .container {
+        padding: 2rem 15px;
+    }
+
+    /* QR Card Styles */
+    .qr-card {
+        background-color: var(--primary-bg);
+        border: 2px solid var(--primary-bg);
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        margin: 1.5rem auto;
+        max-width: 400px;
+    }
+
+    .qr-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .search-bar {
+        max-width: 600px;
+        margin: 2rem auto;
+    }
+
+    .btn-custom {
+        background: var(--primary-bg);
+        color: var(--secondary-bg);
+        transition: all 0.3s ease;
+        border-style: solid;
+        border-color: var(--secondary-bg);
+    }
+
+    .btn-custom:hover {
+        transform: translateY(-2px);
+        color: var(--secondary-bg);
+    }
+
+    .qr-image {
+        border: 2px solid var(--primary-bg);
+        border-radius: 10px;
+        width: 100%;
+        max-width: 200px;
+        height: auto;
+        object-fit: contain;
+    }
+
+    /* Message Alerts */
+    .alert {
+        position: relative;
+        padding: 1.25rem 1.25rem 1.25rem 3rem;
+        border: none;
+        border-radius: 8px;
+        margin: 1rem auto;
+        max-width: 800px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        display: flex;
+        align-items: center;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .alert:before {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        font-size: 1.5rem;
+    }
+
+    .alert-success {
+        background-color: rgba(248, 206, 159, 0.9);
+        color: #723B18;
+        border-left: 4px solid #723B18;
+    }
+
+    .alert-success:before {
+        content: "\f058";
+        color: #4CAF50;
+    }
+
+    .alert-error, .alert-danger {
+        background-color: rgba(255, 107, 107, 0.9);
+        color: #721c24;
+        border-left: 4px solid #721c24;
+    }
+
+    .alert-error:before, .alert-danger:before {
+        content: "\f06a";
+        color: #721c24;
+    }
+
+    .alert-info {
+        background-color: rgba(25, 39, 82, 0.9);
+        color: #F8CE9F;
+        border-left: 4px solid #F8CE9F;
+    }
+
+    .alert-info:before {
+        content: "\f05a";
+        color: #F8CE9F;
+    }
+
+    .alert .close {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: inherit;
+        opacity: 0.8;
+        padding: 0;
+        background: none;
+        border: none;
+    }
+
+    /* Enhanced Pagination */
+.pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin: 2rem 0;
+        padding: 0.5rem 0;
+    }
+
+    .page-link {
+        color: var(--primary-bg);
+        min-width: 40px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--primary-bg);
+        border-color: var(--primary-bg);
+        color: var(--secondary-bg);
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .qr-card {
+            margin: 1rem auto;
+            width: 90%;
+        }
+
+        .action-buttons .btn {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .alert {
+            padding: 1rem 1rem 1rem 2.5rem;
+            font-size: 0.9rem;
+            margin: 1rem 15px;
+        }
+
+        .alert:before {
+            font-size: 1.2rem;
+            left: 0.8rem;
+        }
+
+        .page-link {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.875rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .qr-card {
+            margin: 1rem auto;
+            width: 100%;
+            max-width: none;
+        }
+
+        .alert {
+            padding: 0.8rem 0.8rem 0.8rem 2.2rem;
+            font-size: 0.85rem;
+            margin: 0.5rem 10px;
+            border-radius: 6px;
+        }
+
+        .alert:before {
+            font-size: 1rem;
+            left: 0.6rem;
+        }
+
+        .alert .close {
+            right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 767px) {
+            .pagination {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 0.25rem 0;
+            }
+
+            .page-item {
+                min-width: 40px;
+                flex-shrink: 0;
+            }
+
+            .page-link {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .page-item.active .page-link {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 30mm !important;
+                height: 150mm !important;
+            }
+
+            .container {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 30mm !important;
+                height: 150mm !important;
+            }
+
+            .qr-image {
+                width: 30mm !important;
+                height: 30mm !important;
+                margin: 5mm 0 0 2.5mm !important;
+            }
+
+            .print-label {
+                transform: rotate(90deg);
+                font-size: 10pt;
+                position: absolute;
+                left: -25mm;
+                top: 35mm;
+                white-space: nowrap;
+            }
+
+            .alert, .pagination, .search-bar {
+                display: none !important;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    }
+</style>
+<div class="container mt-4">
+<!-- Message Display Section -->
+<div class="message-container" aria-live="polite" aria-atomic="true">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message|safe }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+
+    <h2 class="text-center mb-4" style="color: var(--primary-bg);">
+        <i class="fas fa-qrcode"></i> QR Codes Generate
+    </h2>
+
+    <!-- Search Form -->
+    <form method="get" class="search-bar">
+        <div class="form-row">
+            <div class="col-12 col-md-9 mb-2 mb-md-0">
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       placeholder="Search by Owner Name, Hide/Skin Tag ID, or Batch No."
+                       value="{{ search_query }}">
+            </div>
+            <div class="col-12 col-md-3">
+                <button class="btn btn-custom btn-block" type="submit">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- QR Code Grid -->
+    <div class="row">
+        {% for qr_code in qr_codes %}
+        <div class="col-12 col-md-6 col-lg-4 mb-4 d-flex justify-content-center">
+            <div class="qr-card p-3 w-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title" style="color: var(--secondary-bg);">
+                        {{ qr_code.data.owner_name }}
+                    </h5>
+                    <p class="mb-1" style="color: var(--secondary-bg);">
+                        Hide/Skin Tag ID: {{ qr_code.data.new_tag }}
+                    </p>
+                    <p class="mb-3" style="color: var(--secondary-bg);">
+                        Batch No: {{ qr_code.data.batch_no }}
+                    </p>
+
+                    <div class="mt-auto">
+                        <img src="data:image/png;base64,{{ qr_code.qr_image }}"
+                             class="qr-image img-fluid mb-3"
+                             alt="QR Code for {{ qr_code.data.owner_name }}">
+                    </div>
+
+                    <div class="action-buttons d-flex flex-wrap justify-content-center">
+                        <a href="{% url 'edit_qr_code' qr_code.data.new_tag %}"
+                           class="btn btn-custom btn-sm m-1">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+
+                        <a href="{% url 'print_tag' qr_code.data.new_tag %}"
+                           class="btn btn-custom btn-sm m-1"
+                           target="_blank">
+                            <i class="fas fa-print"></i> Print
+                        </a>
+
+                        <form action="{% url 'delete_qr_code' qr_code.data.new_tag %}"
+                              method="post"
+                              class="d-inline m-1"
+                              onsubmit="return confirm('Are you sure you want to delete this QR code?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="lead" style="color: var(--primary-bg);">
+                <i class="fas fa-qrcode"></i> No QR codes found
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="QR codes pagination" class="d-flex justify-content-center">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item d-none d-md-block">
+                    <a class="page-link" href="?page=1&search={{ search_query }}" aria-label="First">
+                        &laquo;
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}" aria-label="Previous">
+                        &lsaquo;
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled d-none d-md-block">
+                    <span class="page-link">&laquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&lsaquo;</span>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:-2 and num < page_obj.number|add:2 %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&search={{ search_query }}">{{ num }}</a>
+                    </li>
+                {% elif num == 1 or num == page_obj.paginator.num_pages %}
+                    <li class="page-item d-none d-sm-block">
+                        <a class="page-link" href="?page={{ num }}&search={{ search_query }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}" aria-label="Next">
+                        &rsaquo;
+                    </a>
+                </li>
+                <li class="page-item d-none d-md-block">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}" aria-label="Last">
+                        &raquo;
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&rsaquo;</span>
+                </li>
+                <li class="page-item disabled d-none d-md-block">
+                    <span class="page-link">&raquo;</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<script>
+    // Auto-dismiss alerts
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                new bootstrap.Alert(alert).close();
+            });
+        }, 5000);
+    });
+</script>
+
+{% endblock %}

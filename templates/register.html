@@ -1,0 +1,968 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+    
+<style>
+    /* ====== Enhanced Dropdown Styling ====== */
+    .custom-select {
+        background-color: rgba(248, 206, 159, 0.15) !important;
+        color: var(--secondary-bg) !important;
+        border: 2px solid var(--secondary-bg) !important;
+        transition: all var(--transition-time) ease;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F8CE9F'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 12px;
+        padding-right: 2.5rem !important;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(25, 39, 82, 0.1);
+        border-radius: 0.5rem !important;
+    }
+
+    /* Hover & Focus States */
+    .custom-select:hover {
+        background-color: rgba(248, 206, 159, 0.25) !important;
+        border-color: var(--accent-color) !important;
+        transform: translateY(-1px);
+    }
+
+    .custom-select:focus {
+        border-color: var(--accent-color) !important;
+        box-shadow: 0 0 0 0.25rem rgba(114, 59, 24, 0.25) !important;
+        background-color: rgba(248, 206, 159, 0.3) !important;
+    }
+
+    /* Dropdown Options Styling */
+    .custom-select option {
+        background-color: var(--primary-bg) !important;
+        color: var(--secondary-bg) !important;
+        padding: 12px 15px !important;
+        margin: 4px 0;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .custom-select option:hover {
+        background-color: var(--accent-color) !important;
+        color: var(--secondary-bg) !important;
+        transform: translateX(5px);
+    }
+
+    .custom-select option:checked {
+        background-color: var(--accent-color) !important;
+        color: var(--secondary-bg) !important;
+        font-weight: 600;
+    }
+
+    /* Multiple Select Styling */
+    select[multiple].custom-select {
+        background-image: none;
+        padding-right: 1rem !important;
+        min-height: 120px;
+    }
+
+    select[multiple].custom-select option {
+        margin: 6px 0;
+        padding: 10px 15px !important;
+        border-left: 3px solid var(--accent-color);
+        position: relative;
+    }
+
+    select[multiple].custom-select option::before {
+        content: "✓";
+        position: absolute;
+        left: -20px;
+        color: var(--accent-color);
+        transition: all 0.3s ease;
+        opacity: 0;
+    }
+
+    select[multiple].custom-select option:checked::before {
+        opacity: 1;
+        left: -15px;
+    }
+
+    /* Custom Scrollbar */
+    .custom-select::-webkit-scrollbar {
+        width: 8px;
+        background-color: rgba(248, 206, 159, 0.1);
+    }
+
+    .custom-select::-webkit-scrollbar-thumb {
+        background-color: var(--accent-color);
+        border-radius: 4px;
+    }
+
+    /* ====== Mobile Optimization ====== */
+    @media (max-width: 768px) {
+        .custom-select {
+            background-size: 10px;
+            background-position: right 0.8rem center;
+            padding-right: 2rem !important;
+            font-size: 16px !important;
+        }
+
+        select[multiple].custom-select {
+            min-height: 100px;
+        }
+
+        .custom-select:hover {
+            transform: none;
+        }
+    }
+
+    /* ====== Existing Styles (Maintained) ====== */
+    :root {
+        --primary-bg: #192752;
+        --secondary-bg: #F8CE9F;
+        --accent-color: #723B18;
+        --error-color: #ff6b6b;
+        --transition-time: 0.3s;
+        --input-text: #ffffff;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .signup-container {
+        background-color: var(--secondary-bg);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .auth-card {
+        background-color: var(--primary-bg);
+        color: var(--secondary-bg);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        transition: transform var(--transition-time) ease;
+        max-width: 900px;
+        width: 95%;
+        margin: 0 auto;
+        box-shadow: 0 10px 30px rgba(25, 39, 82, 0.2);
+        padding: 2rem;
+        position: relative;
+    }
+
+    /* Form Elements */
+    .form-control {
+        background-color: var(--primary-bg);
+        border: 2px solid var(--secondary-bg);
+        color: var(--input-text);
+        transition: all var(--transition-time) ease;
+        height: 45px;
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        background-color: rgba(248, 206, 159, 0.25);
+        border-color: var(--accent-color);
+        color: var(--secondary-bg);
+        box-shadow: 0 0 0 0.25rem rgba(114, 59, 24, 0.25);
+        transform: translateY(-2px);
+        outline: none;
+        z-index: 2;
+    }
+
+    /* Role Dropdown Specific Styles */
+    .dropdown-animation {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #id_role {
+        background-color: rgba(248, 206, 159, 0.15);
+        color: var(--input-text);
+        border: 2px solid var(--secondary-bg);
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F8CE9F'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 12px;
+        padding-right: 2.5rem;
+    }
+
+    .input-group-text {
+        background-color: var(--secondary-bg) !important;
+        border: 2px solid var(--secondary-bg) !important;
+        color: var(--primary-bg) !important;
+        transition: all var(--transition-time) ease;
+        height: 45px;
+        padding: 0 15px;
+    }
+
+    .rounded-start-4 {
+        border-start-start-radius: 0.5rem !important;
+        border-end-start-radius: 0.5rem !important;
+    }
+
+    .rounded-end-4 {
+        border-start-end-radius: 0.5rem !important;
+        border-end-end-radius: 0.5rem !important;
+    }
+
+    /* Button Styles */
+    .btn-primary {
+        background-color: var(--secondary-bg);
+        color: var(--accent-color);
+        font-weight: 600;
+        transition: all var(--transition-time) ease;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 0.5rem;
+        width: 100%;
+        height: 45px;
+    }
+
+    .btn-primary:hover {
+        background-color: #f5b97a;
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 4px 15px rgba(114, 59, 24, 0.3);
+    }
+
+    /* Error Handling */
+    .invalid-feedback {
+        color: var(--error-color);
+        font-size: 0.875rem;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .required-asterisk {
+        color: var(--error-color);
+        margin-left: 3px;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .auth-card {
+            width: 95%;
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+
+        .signup-container {
+            padding: 1rem;
+        }
+
+        .form-control,
+        #id_role {
+            height: 50px;
+            font-size: 16px;
+            padding: 14px 15px;
+        }
+
+        .input-group-text {
+            height: 50px;
+            padding: 0 15px;
+        }
+
+        .btn-primary {
+            height: 50px;
+            padding: 15px;
+        }
+
+        .dropdown-animation:hover {
+            transform: none;
+        }
+    }
+
+    /* Animations */
+    @keyframes formEntrance {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-card {
+        animation: formEntrance 0.6s ease-out;
+    }
+</style>
+<style>
+/* Certifications Grid */
+.certification-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.certification-option input[type="checkbox"] {
+    display: none;
+}
+
+.cert-label {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(248, 206, 159, 0.15);
+    border: 2px solid #F8CE9F;
+    border-radius: 0.5rem;
+    color: #F8CE9F;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cert-label:hover {
+    background: rgba(114, 59, 24, 0.3);
+}
+
+.certification-option input:checked + .cert-label {
+    background: #F8CE9F;
+    color: #192752;
+    border-color: #F8CE9F;
+    font-weight: 600;
+}
+#certificationsDropdownBtn {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+.dropdown-menu li {
+    padding: 0.25rem 0.5rem;
+}
+
+.dropdown-menu li label {
+    cursor: pointer;
+    width: 100%;
+}
+@media (max-width: 768px) {
+    .certification-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+<div class="signup-container">
+    <div class="auth-card">
+        <div class="row g-0">
+            <div class="col-md-12 p-3 p-md-5">
+                <h2 class="fw-bold mb-4 text-center">Create Your Account</h2>
+                <p class="text-center" style="color: #F8CE9F;">Sign up to access all features and enjoy seamless functionality.</p>
+            {% if form.errors %}
+    <div class="alert alert-danger">
+        <strong>Error(s):</strong>
+        <ul>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Username -->
+                    <div class="mb-4">
+                        <label for="id_username" class="form-label">Username <span class="required-asterisk">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start-4">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            {{ form.username|add_class:"form-control shadow-sm rounded-end-4" }}
+                        </div>
+                        {% if form.username.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.username.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label for="id_email" class="form-label">Email <span class="required-asterisk">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start-4">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                            {{ form.email|add_class:"form-control shadow-sm rounded-end-4" }}
+                        </div>
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.email.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="text-muted d-block mt-2" style="color: rgba(255, 255, 255, 0.7) !important;">
+                            Please be aware that the email address provided during registration is permanent and cannot be modified. Should you desire to use a different email address, you will be required to establish a new account.
+                        </small>
+                    </div>
+
+                    <!-- Passwords -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label for="id_password1" class="form-label">Password <span class="required-asterisk">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text rounded-start-4">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    {{ form.password1|add_class:"form-control shadow-sm rounded-end-4" }}
+                                </div>
+                                {% if form.password1.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.password1.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label for="id_password2" class="form-label">Confirm Password <span class="required-asterisk">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text rounded-start-4">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    {{ form.password2|add_class:"form-control shadow-sm rounded-end-4" }}
+                                </div>
+                                {% if form.password2.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.password2.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <!-- Contact -->
+                    <div class="mb-4">
+                        <label for="id_contact_no" class="form-label">Contact <span class="required-asterisk">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start-4">
+                                <i class="fas fa-phone"></i>
+                            </span>
+                            {{ form.contact_no|add_class:"form-control shadow-sm rounded-end-4" }}
+                        </div>
+                        {% if form.contact_no.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.contact_no.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <!-- Role -->
+                    <div class="mb-4 dropdown-animation">
+                        <label for="id_role" class="form-label">Role <span class="required-asterisk">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start-4">
+                                <i class="fas fa-user-tag"></i>
+                            </span>
+                            <select name="role" id="id_role" class="form-control shadow-sm rounded-end-4 custom-select">
+                                <option value="">Select Role</option>
+                                <option value="slaughterhouse">Slaughterhouse</option>
+                                <option value="trader">Trader</option>
+                                <option value="tannery">Tannery</option>
+                                <option value="garment">Garment</option>
+                            </select>
+                        </div>
+                        {% if form.role.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.role.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+<!-- Brand Section -->
+<div class="mb-4 dropdown-animation" id="brand_field" style="display: none;">
+    <label for="id_brand" class="form-label">Brand <span class="required-asterisk">*</span></label>
+    <div class="input-group">
+        <span class="input-group-text rounded-start-4">
+            <i class="fas fa-industry"></i>
+        </span>
+        <select name="brand" id="id_brand" class="form-control shadow-sm rounded-end-4 custom-select">
+            <option value="">Select Brand</option>
+            <!-- Options will be injected dynamically by JavaScript -->
+        </select>
+    </div>
+    {% if form.brand.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.brand.errors %}{{ error }}{% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Custom Brand Field -->
+<div class="mb-4" id="other_brand_field" style="display: none;">
+    <label for="custom_brand" class="form-label">Brand Name <span class="required-asterisk">*</span></label>
+    <input type="text" name="custom_brand" id="custom_brand"
+           class="form-control shadow-sm rounded-end-4"
+           placeholder="Enter brand name">
+</div>
+
+                    <!-- Business Info -->
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="mb-4">
+            <label for="id_business_type" class="form-label">Business Type </label>
+            <div class="input-group">
+                <span class="input-group-text rounded-start-4">
+                    <i class="fas fa-building"></i>
+                </span>
+                {{ form.business_type|add_class:"form-control shadow-sm rounded-end-4" }}
+            </div>
+            {% if form.business_type.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.business_type.errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+                <small class="text-muted d-block mt-2" style="color: rgba(255, 255, 255, 0.7) !important;">
+        The business type cannot be classified as an exporter
+    </small>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="mb-4 dropdown-animation">
+            <label for="id_operation_type" class="form-label">Operation Type</label>
+            <div class="input-group">
+                <span class="input-group-text rounded-start-4">
+                    <i class="fas fa-industry"></i>
+                </span>
+                <select name="operation_type" id="id_operation_type" class="form-control shadow-sm rounded-end-4 custom-select">
+                    <option value="">Select Operation Type</option>
+                    <option value="Raw">Raw</option>
+                    <option value="Raw to Wet">Raw to Wet</option>
+                    <option value="Wet to Finish">Wet to Finish</option>
+                    <option value="Raw to Finish">Raw to Finish</option>
+                </select>
+            </div>
+            {% if form.operation_type.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.operation_type.errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<!-- Materials -->
+<div class="row g-3">
+    <!-- Leather Types -->
+    <div class="col-md-6">
+        <div class="mb-4">
+            <label class="form-label">
+                Leather Types <small class="text-muted">(Click to select multiple)</small>
+            </label>
+            <div class="input-group">
+                <span class="input-group-text rounded-start-4">
+                    <i class="fas fa-cut"></i>
+                </span>
+                <div class="dropdown" style="width: 86%;">
+                    <button class="btn btn-outline-secondary form-control text-start dropdown-toggle" style="color: #F8CE9F;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Select Leather Types
+                    </button>
+                    <ul class="dropdown-menu w-100 px-3" style="max-height: 250px; overflow-y: auto;" id="leatherTypesDropdown">
+                    <li class="mb-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary w-100" id="toggleLeatherSelectAll">✔ Select All</button>
+                    </li>
+                    <!-- <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="All ✓" name="leather_types">All ✓</label></li> -->
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Full grain" name="leather_types"><span class="label-text">Full grain</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Lining" name="leather_types"><span class="label-text">Lining</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Patent" name="leather_types"><span class="label-text">Patent</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Printed" name="leather_types"><span class="label-text">Printed</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="PU coated" name="leather_types"><span class="label-text">PU coated</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Skins" name="leather_types"><span class="label-text">Skins</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Sole" name="leather_types"><span class="label-text">Sole</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Split" name="leather_types"><span class="label-text">Split</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Suede" name="leather_types"><span class="label-text">Suede</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Top Grain Split" name="leather_types"><span class="label-text">Top Grain Split</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Wool-on" name="leather_types"><span class="label-text">Wool-on</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Flesh/Drop Splits" name="leather_types"><span class="label-text">Flesh/Drop Splits</span></label></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const toggleLeatherBtn = document.getElementById('toggleLeatherSelectAll');
+        const leatherCheckboxes = document.querySelectorAll('input[name="leather_types"]');
+
+        toggleLeatherBtn.addEventListener('click', function () {
+            const allChecked = Array.from(leatherCheckboxes).every(cb => cb.checked);
+            leatherCheckboxes.forEach(cb => cb.checked = !allChecked);
+            toggleLeatherBtn.textContent = allChecked ? '✔ Select All' : '✖ Deselect All';
+        });
+        });
+    </script>
+
+
+    <!-- Animal Types -->
+    <!-- Bootstrap CSS -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+
+    <div class="col-md-6">
+    <div class="mb-4">
+        <label class="form-label">
+        Animal Types <small class="text-muted">(Click to select multiple)</small>
+        </label>
+        <div class="input-group">
+            <span class="input-group-text rounded-start-4">
+                <i class="fas fa-cut"></i>
+            </span>
+            <div class="dropdown" style="width: 86%;">
+                <button class="btn btn-outline-secondary form-control text-start dropdown-toggle" style="color: #F8CE9F;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Select Animal Types
+                </button>
+                <ul class="dropdown-menu w-100 px-3" style="max-height: 250px; overflow-y: auto;" id="animalTypesDropdown">
+                    <li class="mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary w-100" id="toggleSelectAll">✔ Select All</button>
+                    </li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Cow" name="animal_types"><span class="label-text">Cow</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Buffalo" name="animal_types"><span class="label-text">Buffalo</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Sheep" name="animal_types"><span class="label-text">Sheep</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Goat" name="animal_types"><span class="label-text">Goat</span></label></li>
+                    <li><label class="form-check d-flex align-items-center"><input class="form-check-input me-2 big-checkbox" type="checkbox" value="Camel" name="animal_types"><span class="label-text">Camel</span></label></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Custom CSS for bigger checkboxes -->
+    <style>
+        .big-checkbox {
+          width: 1.5em;
+          height: 1.5em;
+        }
+
+        .label-text {
+            padding-left: 8px; /* adjust as needed */
+            padding-top: 5px;
+        }
+
+    </style>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript for Select All / Deselect All -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleBtn = document.getElementById('toggleSelectAll');
+        const checkboxes = document.querySelectorAll('input[name="animal_types"]');
+
+        toggleBtn.addEventListener('click', function () {
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        checkboxes.forEach(cb => cb.checked = !allChecked);
+        toggleBtn.textContent = allChecked ? '✔ Select All' : '✖ Deselect All';
+        });
+    });
+    </script>
+
+</div>
+
+                    <!-- Location -->
+<div class="row g-3">
+<div class="col-md-6">
+<div class="mb-4 dropdown-animation">
+    <label for="id_city" class="form-label">City <span class="required-asterisk">*</span></label>
+    <div class="input-group">
+        <span class="input-group-text rounded-start-4">
+            <i class="fas fa-city"></i>
+        </span>
+        <select name="city" id="id_city" class="form-control shadow-sm rounded-end-4 custom-select">
+            <option value="">Select City</option>
+            <option value="Lahore">Lahore</option>
+            <option value="Islamabad">Islamabad</option>
+            <option value="Karachi">Karachi</option>
+            <option value="Sialkot">Sialkot</option>
+            <option value="Multan">Multan</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+    <div id="customCityInput" class="mt-2" style="display: none;">
+        <!-- Changed name to custom_city -->
+        <input type="text" class="form-control shadow-sm"
+               name="custom_city"
+               placeholder="Enter your city name"
+               id="cityTextInput">
+    </div>
+    {% if form.city.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.city.errors %}{{ error }}{% endfor %}
+        </div>
+    {% endif %}
+</div>
+    </div>
+    <!-- Address field remains unchanged -->
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label for="id_location" class="form-label">Address </label>
+                                <div class="input-group">
+                                    <span class="input-group-text rounded-start-4">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </span>
+                                    {{ form.location|add_class:"form-control shadow-sm rounded-end-4" }}
+                                </div>
+                                {% if form.location.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.location.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certifications -->
+<div class="mb-4">
+    <label class="form-label">Certifications <small class="text-muted">(Click to select multiple)</small></label>
+    <div class="input-group">
+        <span class="input-group-text rounded-start-4">
+            <i class="fas fa-certificate"></i>
+        </span>
+        <div class="dropdown" style="width: 86%;">
+            <button class="btn btn-outline-secondary form-control text-start dropdown-toggle"
+                    style="color: #F8CE9F;"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    id="certificationsDropdownBtn">
+                Select Certifications
+            </button>
+            <ul class="dropdown-menu w-100 px-3" style="max-height: 250px; overflow-y: auto;">
+                <li class="mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary w-100"
+                            id="toggleCertSelectAll">
+                        ✔ Select All
+                    </button>
+                </li>
+                {% for value, text in form.certifications.field.choices %}
+                <li>
+                    <label class="form-check d-flex align-items-center">
+                        <input class="form-check-input me-2 big-checkbox"
+                               type="checkbox"
+                               value="{{ value }}"
+                               name="certifications"
+                               {% if value in form.certifications.value %}checked{% endif %}>
+                        <span class="label-text">{{ text }}</span>
+                    </label>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div id="customCertInput" class="mt-2" style="display: none;">
+        {{ form.custom_certification|add_class:"form-control shadow-sm" }}
+    </div>
+    {% if form.custom_certification.errors %}
+        <div class="invalid-feedback d-block">
+            {% for error in form.custom_certification.errors %}{{ error }}{% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 mt-4">
+                        Create Account
+                    </button>
+                 </form>
+
+                <div class="mt-4 text-center">
+                    <p class="text-muted" style="color: rgba(255, 255, 255, 0.7) !important;">
+                        Already have an account?
+                        <a href="{% url 'login' %}" class="text-link" style="color: var(--secondary-bg) !important;">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const citySelect = document.getElementById("id_city");
+    const customCityDiv = document.getElementById("customCityInput");
+    const cityTextInput = document.getElementById("cityTextInput");
+
+    function updateCityField() {
+        if (citySelect.value === "Other") {
+            customCityDiv.style.display = "block";
+            cityTextInput.required = true;
+        } else {
+            customCityDiv.style.display = "none";
+            cityTextInput.required = false;
+        }
+    }
+
+    // Update text input when dropdown changes
+    citySelect.addEventListener("change", function() {
+        updateCityField();
+        if (this.value !== "Other") {
+            cityTextInput.value = ""; // Clear text input if not "Other"
+        }
+    });
+
+    // Update dropdown value to "Other" when typing in text input
+    cityTextInput.addEventListener("input", function() {
+        if (this.value.trim() !== "") {
+            citySelect.value = "Other"; // Force dropdown to show "Other"
+        }
+    });
+
+    updateCityField(); // Initial check
+});
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const roleField = document.getElementById("id_role");
+        const brandFieldDiv = document.getElementById("brand_field");
+        const brandSelect = document.getElementById("id_brand");
+        const otherBrandFieldDiv = document.getElementById("other_brand_field");
+        const customBrandInput = document.getElementById("custom_brand");
+
+        const brandOptionsMap = {
+            'slaughterhouse': ['PAMCO'],
+            'trader': ['ABC_Trader'],
+            'tannery': ['LeatherField_Tannery'],
+            'garment': ['LeatherField_Garment']
+        };
+
+        const rolesWithBrand = Object.keys(brandOptionsMap);
+
+        function updateBrandOptions(role) {
+            brandSelect.innerHTML = '<option value="">Select Brand</option>';
+
+            if (role in brandOptionsMap) {
+                brandOptionsMap[role].forEach(function (brand) {
+                    const option = new Option(brand, brand);
+                    brandSelect.add(option);
+                });
+            }
+
+            // Add the universal "Other" option
+            brandSelect.add(new Option('Other', 'Other'));
+        }
+
+        function toggleBrandFields() {
+            const role = roleField.value.toLowerCase();
+            const showBrand = rolesWithBrand.includes(role);
+
+            if (showBrand) {
+                updateBrandOptions(role);
+                brandFieldDiv.style.display = 'block';
+
+                // Automatically show/hide other brand field based on current selection
+                if (brandSelect.value === 'Other') {
+                    otherBrandFieldDiv.style.display = 'block';
+                    customBrandInput.required = true;
+                } else {
+                    otherBrandFieldDiv.style.display = 'none';
+                    customBrandInput.required = false;
+                }
+
+            } else {
+                brandFieldDiv.style.display = 'none';
+                otherBrandFieldDiv.style.display = 'none';
+                customBrandInput.required = false;
+            }
+        }
+
+        function handleBrandSelection() {
+            if (brandSelect.value === 'Other') {
+                otherBrandFieldDiv.style.display = 'block';
+                customBrandInput.required = true;
+            } else {
+                otherBrandFieldDiv.style.display = 'none';
+                customBrandInput.required = false;
+            }
+        }
+
+        // When typing in custom brand, auto-select "Other"
+        if (customBrandInput) {
+            customBrandInput.addEventListener('input', function () {
+                brandSelect.value = 'Other';
+                handleBrandSelection();
+            });
+        }
+
+        roleField.addEventListener('change', toggleBrandFields);
+        brandSelect.addEventListener('change', handleBrandSelection);
+
+        // Run on load
+        toggleBrandFields();
+    });
+</script>
+ <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Certifications handling
+    const certCheckboxes = document.querySelectorAll('input[name="certifications"]');
+    const customCertInput = document.getElementById('customCertInput');
+    const certDropdownBtn = document.getElementById('certificationsDropdownBtn');
+
+    // Toggle Select All
+    document.getElementById('toggleCertSelectAll').addEventListener('click', function() {
+        const allChecked = Array.from(certCheckboxes).every(cb => cb.checked);
+        certCheckboxes.forEach(cb => cb.checked = !allChecked);
+        this.textContent = allChecked ? '✔ Select All' : '✖ Deselect All';
+        updateCertButtonText();
+    });
+
+    // Update dropdown button text
+    function updateCertButtonText() {
+        const selected = Array.from(certCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.nextElementSibling.textContent.trim());
+
+        if (selected.length > 0) {
+            certDropdownBtn.innerHTML = selected.join(', ');
+        } else {
+            certDropdownBtn.innerHTML = 'Select Certifications';
+        }
+    }
+
+    // Handle "Other" selection
+    certCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                customCertInput.style.display = this.checked ? 'block' : 'none';
+            }
+            updateCertButtonText();
+        });
+    });
+
+    // Initial check for "Other"
+    const otherCheckbox = Array.from(certCheckboxes).find(cb => cb.value === 'Other');
+    if (otherCheckbox && otherCheckbox.checked) {
+        customCertInput.style.display = 'block';
+    }
+        // Mobile View Adjustments
+    function adjustMobileView() {
+        if (window.innerWidth <= 768) {
+            document.querySelectorAll('.form-control').forEach(input => {
+                input.style.borderWidth = '2px';
+            });
+        }
+    }
+    adjustMobileView();
+    window.addEventListener('resize', adjustMobileView);
+});
+</script>
+{% endblock %}

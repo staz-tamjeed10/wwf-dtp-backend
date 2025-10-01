@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Services{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Our Services</h1>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="{% static 'images/leatherjackets.jpeg' %}" class="card-img-top" alt="Leather Jacket Tracking">
+                <div class="card-body">
+                    <h5 class="card-title">Leather Jacket Tracking</h5>
+                    <p class="card-text">Track your leather jacket using our state-of-the-art QR code technology.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="{% static 'images/Q%20(1).jpg' %}" class="card-img-top" alt="QR Code Generation">
+                <div class="card-body">
+                    <h5 class="card-title">QR Code Generation</h5>
+                    <p class="card-text">Generate unique QR codes for your products to easily track and manage them.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="{% static 'images/Customjacket.png' %}" class="card-img-top" alt="Custom Leather Products">
+                <div class="card-body">
+                    <h5 class="card-title">Custom Leather Products</h5>
+                    <p class="card-text">Get custom leather products tailored to your specifications and style.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Card Styling */
+    .card {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .card-title {
+        color: #00796B;
+        font-family: 'Merriweather', serif;
+    }
+    .card-text {
+        color: #212121;
+    }
+
+    /* Image Styling */
+    .card-img-top {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    /* Header Styling */
+    h1 {
+        color: #00796B;
+        font-family: 'Merriweather', serif;
+    }
+</style>
+{% endblock %}

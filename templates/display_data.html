@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% load tz %}
+
+{% block title %}Display Data{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-bg: #192752;
+        --secondary-bg: #F8CE9F;
+        --text-color: #5A2912;
+    }
+
+    .container-fluid {
+        background-color: var(--secondary-bg);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+    }
+
+    .glass-card {
+        background: var(--secondary-bg);
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin: 0 auto;
+        max-width: 1200px;
+    }
+
+    .header h2 {
+        color: var(--primary-bg);
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+    }
+
+    .table-custom {
+        background-color: var(--primary-bg);
+        color: var(--secondary-bg);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table-custom th, .table-custom td {
+        border-color: var(--secondary-bg);
+        padding: 12px;
+        text-align: left;
+    }
+
+    .table-custom tbody tr:hover {
+        background-color: rgba(248, 206, 159, 0.3);
+    }
+
+    .map-link {
+        color: var(--secondary-bg);
+        transition: color 0.3s ease;
+    }
+
+    .map-link:hover {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+        .glass-card {
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .table-custom {
+            min-width: 600px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container-fluid {
+            padding: 1rem;
+        }
+        
+        .glass-card {
+            padding: 1rem;
+        }
+        
+        .header h2 {
+            font-size: 1.75rem;
+        }
+        
+        h3.text-center {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="container-fluid my-5">
+    <div class="glass-card">
+        {% if error_message %}
+        <div class="alert alert-danger text-center">
+            <p>{{ error_message }}</p>
+        </div>
+        {% else %}
+        <div class="header text-center mb-4">
+            <h2>{{ data_type|title }} Data Details</h2>
+        </div>
+
+        <!-- Main Data Table -->
+        {% if tag_instance %}
+        <div class="table-responsive mb-5">
+            <table class="table table-custom table-striped">
+                <tbody>
+                    <tr>
+                        <th>Hide/Skin Tag ID</th>
+                        <td>{{ tag_instance.new_tag|default:"N/A" }}</td>
+                    </tr>
+{#                    <tr>#}
+{#                        <th>PAMCO Tag ID</th>#}
+{#                        <td>{{ tag_instance.old_tag|default:"N/A" }}</td>#}
+{#                    </tr>#}
+                    <!-- <tr>
+                        <th>Supplier</th>
+                        <td>{{ tag_instance.owner_name|default:"N/A" }}</td>
+                    </tr> -->
+                    <tr>
+                        <th>Supplier ID</th>
+                        <td>{{ tag_instance.batch_no|default:"N/A" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Animal Type</th>
+                        <td>{{ tag_instance.product_code|default:"N/A" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Slaughter Date</th>
+                        <td>{{ tag_instance.datetime|default:"N/A" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Leather Type</th>
+                        <td>{{ tag_instance.hide_source|default:"N/A" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Origin</th>
+                        <td>
+                            {% if tag_instance.origin %}
+                                <a class="map-link" href="https://www.google.com/maps/search/?api=1&query={{ tag_instance.origin }}" target="_blank">
+                                    {{ tag_instance.origin }}
+                                </a>
+                            {% else %}
+                                Lahore
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Hide/Skin Type</th>
+                        <td>
+                            {% if tag_instance.hide_source in "Cow,Buffalo,Camel" %}
+                                Hide
+                            {% elif tag_instance.hide_source in "Goat,Sheep" %}
+                                Skin
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Vehicle Number</th>
+                        <td>{{ tag_instance.vehicle_number|default:"N/A" }}</td>
+                    </tr>
+                    <!-- <tr>
+                        <th>Trader Name</th>
+                        <td>{{ tag_instance.trader_name|default:"N/A" }}</td>
+                    </tr> -->
+                    <tr>
+                        <th>Tannery Stamp Code</th>
+                        <td>{{ tag_instance.tannery_stamp_code|default:"N/A" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Processed Lot Number</th>
+                        <td>{{ tag_instance.processed_lot_number|default:"N/A" }}</td>
+                    </tr>
+                    <!-- <tr>
+                        <th>Dispatch Factory Name</th>
+                        <td>{{ tag_instance.dispatch_to|default:"N/A" }}</td>
+                    </tr> -->
+<tr>
+    <th>Product Type</th>
+    <td>
+        {% for type in tag_instance.get_product_types_list %}
+            {% if type == "Other" and tag_instance.other_product_type %}
+                {{ tag_instance.other_product_type }}
+            {% else %}
+                {{ type }}
+            {% endif %}
+            {% if not forloop.last %}, {% endif %}
+        {% empty %}
+            N/A
+        {% endfor %}
+    </td>
+</tr>
+                    <tr>
+                        <th>Brand</th>
+                        <td>{{ tag_instance.brand|default:"N/A" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Process Date</th>
+                        <td>{{ tag_instance.g_date|default:"N/A" }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Tannery Information -->
+        {% if tag_instance and tag_instance.tannery %}
+        <div class="mt-5">
+            <h3 class="text-center font-weight-bold mb-4">Tannery Information</h3>
+            <div class="table-responsive">
+                <table class="table table-custom table-striped">
+                    <tbody>
+                        <tr>
+                            <th>Name</th>
+                            <td>{{ tag_instance.tannery.name|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Location</th>
+                            <td>{{ tag_instance.tannery.location|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Contact</th>
+                            <td>{{ tag_instance.tannery.contact|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ tag_instance.tannery.email|default:"N/A" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Transaction Logs -->
+        <div class="mt-5">
+            <h3 class="text-center font-weight-bold mb-4" style="color: var(--primary-bg);">Transaction Logs</h3>
+            <div class="table-responsive">
+                <table class="table table-custom table-striped">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Performed By</th>
+                            <th>Role</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in transaction_logs %}
+                        <tr>
+                            <td>{{ log.action|title }}</td>
+                            <td>{{ log.user.username }}@{{ log.user.profile.brand }}</td>
+                            <td>{{ log.actor_type|title }}</td>
+                            <td>{{ log.pakistan_time }}</td> <!-- Displays in Pakistan time -->
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No transaction logs available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

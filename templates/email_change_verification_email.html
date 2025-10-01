@@ -1,0 +1,14 @@
+{% autoescape off %}
+Hi {{ user.username }},
+
+You have requested to change your email address. Please verify your new email address by clicking the link below:
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+If you did not make this request, please ignore this email.
+
+Thank you for choosing us!
+
+Best regards,
+<span style="color: #00796B;">Leather Tracking</span>
+{% endautoescape %}

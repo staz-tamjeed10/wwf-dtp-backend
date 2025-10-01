@@ -1,0 +1,523 @@
+{% extends 'base.html' %}
+{% block title %}Garment Unit/Factory Dashboard{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    .stamp-feedback { font-size: 0.9rem; margin-top: 0.25rem; }
+    .is-valid { border-color: #28a745 !important; }
+    .is-invalid { border-color: #dc3545 !important; }
+</style>
+<style>
+    :root {
+        --primary-bg: #192752;
+        --secondary-bg: #F8CE9F;
+        --accent-color: #723B18;
+        --success-color: #28a745;
+        --text-light: #F8CE9F;
+        --transition-time: 0.3s;
+    }
+
+    .transaction-container {
+        background-color: #F8CE9F;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+    }
+
+    .profile-header {
+        background-color: var(--primary-bg);
+        color: var(--text-light);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        margin: 1.5rem auto;
+        box-shadow: 0 10px 30px rgba(25, 39, 82, 0.2);
+        max-width: 800px;
+        animation: formEntrance 0.6s ease-out;
+    }
+
+    .transaction-card {
+        background-color: var(--primary-bg);
+        color: var(--secondary-bg);
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 30px rgba(25, 39, 82, 0.2);
+        margin: 1.5rem auto;
+        animation: formEntrance 0.6s ease-out;
+        max-width: 800px;
+        padding: 2rem;
+    }
+
+    .dispatch-card {
+        background-color: var(--primary-bg);
+    }
+
+    .profile-detail {
+        padding: 0.75rem 1rem;
+        margin: 0.5rem 0;
+        background-color: rgba(248, 206, 159, 0.1);
+        border-radius: 0.75rem;
+        transition: all var(--transition-time) ease;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: var(--secondary-bg);
+    }
+
+    .form-control {
+        background-color: rgba(248, 206, 159, 0.15);
+        border: 2px solid var(--secondary-bg);
+        color: var(--text-light);
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        transition: all var(--transition-time) ease;
+    }
+
+    .form-control:focus {
+        background-color: rgba(248, 206, 159, 0.25);
+        border-color: var(--accent-color);
+        color: var(--secondary-bg);
+        box-shadow: 0 0 0 0.25rem rgba(114, 59, 24, 0.25);
+    }
+
+    .btn {
+        flex: 1;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        transition: all var(--transition-time) ease;
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: var(--secondary-bg);
+        color: var(--primary-bg);
+    }
+
+    .btn-primary:hover {
+        background-color: #f5b97a;
+        transform: translateY(-3px);
+    }
+
+    .product-types-checkboxes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .input-group-text {
+        background-color: rgba(248, 206, 159, 0.2);
+        border: 2px solid var(--secondary-bg);
+        color: var(--text-light);
+    }
+    .alert {
+        max-width: 800px;
+        margin: 1rem auto;
+        border-radius: 0.75rem;
+        padding: 1rem 2rem;
+        position: relative;
+    }
+
+    .alert-success {
+        background-color: #28a745;
+        color: white;
+        border: none;
+    }
+
+    .alert-error {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+    }
+
+    .alert-info {
+        background-color: var(--primary-bg);
+        color: var(--text-light);
+        border: none;
+    }
+
+    .btn-close {
+        filter: invert(1);
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    @keyframes formEntrance {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .transaction-container {
+            padding: 1rem 0.5rem;
+        }
+
+        .profile-header,
+        .transaction-card {
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+
+        .product-types-checkboxes {
+            grid-template-columns: 1fr;
+        }
+    }
+        .tag-feedback { display: none; font-size: 0.875rem; }
+    .is-invalid { border-color: #dc3545 !important; }
+    .is-valid { border-color: #28a745 !important; }
+    #tagInputs .input-group { position: relative; }
+    .dynamic-input-animation { animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="transaction-container">
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <h2 class="text-center mb-4">Garment Unit/Factory Dashboard</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="profile-detail">
+                        <strong>Username:</strong> {{ user.username }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Email:</strong> {{ user.email }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Contact:</strong> {{ user.profile.contact }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Role:</strong> {{ user.profile.role|title }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Business Type:</strong> {{ user.profile.business_type }}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="profile-detail">
+                        <strong>Operation Type:</strong> {{ user.profile.operation_type }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Animal Types:</strong> {{ user.profile.animal_types }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Leather Types:</strong> {{ user.profile.leather_types }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>City:</strong> {{ user.profile.city }}
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="profile-detail">
+                        <strong>Address:</strong> {{ user.profile.location }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Certifications:</strong> {{ user.profile.certifications }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Last Login:</strong> {{ user.last_login|date:"M d, Y h:i A" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- garment.html (at the top of the content block) -->
+{% if messages %}
+<div class="messages-container">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+        <!-- Arrival Form -->
+        <!-- Arrival Form -->
+        <div class="transaction-card">
+            <h3 class="text-center mb-4"><i class="bi bi-box-arrow-in-down"></i> Product Arrival</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="arrived">
+                
+                <div class="mb-4">
+                    <label class="form-label">Enter Unique Tannery Code:</label>
+                    <div class="input-group">
+                        <input type="text" 
+                               name="search_id"
+                               class="form-control"
+                               placeholder="Enter Unique Tannery Code"
+                               required
+                               title="Digit number">
+                        <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+                    </div>
+                    <div class="tag-feedback text-danger mt-1"></div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-check-circle"></i> Mark Arrived
+                </button>
+            </form>
+        </div>
+
+        <!-- Dispatch Form -->
+        <!-- Dispatch Form -->
+        <div class="transaction-card dispatch-card">
+            <h3 class="text-center mb-4"><i class="bi bi-truck"></i> Product Dispatch</h3>
+            <form method="POST" id="dispatchForm">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label">Number of Pieces:</label>
+                    <input type="number" 
+                           id="num_pieces"
+                           name="num_pieces"
+                           class="form-control"
+                           min="1" 
+                           value="1"
+                           required>
+                </div>
+
+                <div id="stampInputs" class="mb-4"></div>
+
+<div class="mb-4">
+    <label class="form-label">Product Type</label>
+    <div class="product-types-checkboxes">
+        {% for value, label in product_types %}
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   name="product_types" 
+                   value="{{ value }}"
+                   id="type-{{ value }}"
+                   {% if value == 'Other' %}onchange="toggleOtherProduct()"{% endif %}>
+            <label class="form-check-label" for="type-{{ value }}">
+                {{ label }}
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Other Product Type Input -->
+<div id="otherProductTypeContainer" class="mb-4" style="display: none;">
+    <label class="form-label">Specify Custom Product:</label>
+    <input type="text" 
+           name="other_product_type"
+           class="form-control"
+           placeholder="Enter your custom product type"
+           maxlength="100">
+</div>
+
+                <div class="mb-4">
+                    <label class="form-label">Brand Name:</label>
+                    <input type="text" 
+                           name="brand"
+                           class="form-control"
+                           required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Processing Date & Time:</label>
+                    <input type="datetime-local" 
+                           name="g_date"
+                           class="form-control"
+                           required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-qr-code"></i> Generate Product QR
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+        const config = {
+        apiEndpoints: {
+            tagStatus: '/check-tag-status/',
+            checkTags: '/api/check-tags/'
+        },
+        selectors: {
+            numPieces: '#num_pieces',
+            tagContainer: '#tagInputs',
+            dispatchForm: '#dispatchForm',
+            datetimeField: '[name="g_date"]',
+            otherCheckbox: '#type-Other',
+            otherContainer: '#otherProductTypeContainer',
+            otherProductInput: '[name="other_product_type"]'
+        }
+    };
+
+    // State
+    let currentTags = new Set();
+
+    // Initialize modules
+    initDynamicInputs();
+    initDateTime();
+    initOtherProductToggle();
+
+    function initDynamicInputs() {
+        const numInput = document.querySelector('[name="num_pieces"]');
+        const stampContainer = document.getElementById('stampInputs');
+
+        function generateInputs() {
+            const count = parseInt(numInput.value) || 0;
+            stampContainer.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                const div = document.createElement('div');
+                div.className = 'mb-3';
+                div.innerHTML = `
+                <label class="form-label">Enter Unique Tannery Stamp Code #${i + 1} :</label>
+                <input type="text" 
+                       name="stamp_code_${i + 1}"
+                       class="form-control stamp-input"
+                       title="digit number"
+                       required>
+                <div class="stamp-feedback"></div>
+            `;
+                stampContainer.appendChild(div);
+            }
+            initValidation();
+        }
+
+        function initValidation() {
+            document.querySelectorAll('.stamp-input').forEach(input => {
+                input.addEventListener('input', function () {
+                    const code = this.value.trim();
+                    const feedback = this.nextElementSibling;
+
+                    // Client-side validation
+                    if (!/^\d+$/.test(code)) {
+                        feedback.textContent = "Only numbers allowed";
+                        feedback.style.color = '#dc3545';
+                        this.classList.add('is-invalid');
+                        return;
+                    }
+
+                    if (code.length < 0) {
+                        feedback.textContent = "Minimum 1 digits required";
+                        feedback.style.color = '#dc3545';
+                        this.classList.add('is-invalid');
+                        return;
+                    }
+
+                    // Server validation
+                    fetch(`/validate-stamp/?code=${code}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            feedback.textContent = data.formatted || '';
+                            if (data.valid) {
+                                this.classList.remove('is-invalid');
+                                this.classList.add('is-valid');
+                                feedback.style.color = '#28a745';
+                            } else {
+                                this.classList.add('is-invalid');
+                                feedback.textContent = data.error;
+                                feedback.style.color = '#dc3545';
+                            }
+                        });
+                });
+            });
+        }
+
+        numInput.addEventListener('change', generateInputs);
+        generateInputs();
+
+        // Validate Other product type
+        const otherChecked = document.querySelector(config.selectors.otherCheckbox).checked;
+        const otherValue = document.querySelector(config.selectors.otherProductInput).value.trim();
+        if (otherChecked && !otherValue) {
+            e.preventDefault();
+            alert('Please specify the custom product type');
+            return;
+        }
+    }
+    function initDateTime() {
+        const dtField = document.querySelector(config.selectors.datetimeField);
+        if (!dtField.value) {
+            const now = new Date();
+            dtField.value = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
+        }
+    }
+
+    function initOtherProductToggle() {
+        const otherCheckbox = document.querySelector(config.selectors.otherCheckbox);
+        const otherContainer = document.querySelector(config.selectors.otherContainer);
+        const otherInput = document.querySelector(config.selectors.otherProductInput);
+
+        function toggleOtherProduct() {
+            if (otherCheckbox.checked) {
+                otherContainer.style.display = 'block';
+                otherInput.required = true;
+            } else {
+                otherContainer.style.display = 'none';
+                otherInput.required = false;
+                otherInput.value = '';
+            }
+        }
+
+        otherCheckbox.addEventListener('change', toggleOtherProduct);
+        toggleOtherProduct();
+    }
+
+    function showFeedback(input, message, type) {
+        const feedback = input.parentNode.querySelector('.tag-feedback');
+        feedback.textContent = message;
+        feedback.className = `tag-feedback text-${type === 'valid' ? 'success' : 'danger'}`;
+        input.dataset.valid = (type === 'valid').toString();
+        input.classList.toggle('is-invalid', type === 'invalid');
+        input.classList.toggle('is-valid', type === 'valid');
+    }
+
+    // Auto-dismiss alerts after 5 seconds
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+            new bootstrap.Alert(alert).close();
+        });
+    }, 5000);
+});
+</script>
+       <script>
+function toggleOtherProduct() {
+    const otherCheckbox = document.getElementById('type-Other');
+    const otherContainer = document.getElementById('otherProductTypeContainer');
+    
+    if (otherCheckbox.checked) {
+        otherContainer.style.display = 'block';
+        document.querySelector('[name="other_product_type"]').required = true;
+    } else {
+        otherContainer.style.display = 'none';
+        document.querySelector('[name="other_product_type"]').required = false;
+        document.querySelector('[name="other_product_type"]').value = '';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Initial check for Other checkbox state
+    toggleOtherProduct();
+    
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const otherChecked = document.getElementById('type-Other').checked;
+        const otherValue = document.querySelector('[name="other_product_type"]').value.trim();
+        
+        if (otherChecked && !otherValue) {
+            e.preventDefault();
+            alert('Please specify the custom product type');
+            document.querySelector('[name="other_product_type"]').focus();
+        }
+    });
+});
+</script>
+{% endblock %}

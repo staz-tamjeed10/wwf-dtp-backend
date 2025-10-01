@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}Leather Tags{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-4">
+    <h2 class="mb-4">Hides Tags</h2>
+
+    <!-- Date Picker -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="datePicker" class="form-label">Select Date:</label>
+            <input type="date" id="datePicker" class="form-control" value="{{ selected_date|date:'Y-m-d' }}">
+        </div>
+        <div class="col-md-2">
+            <label for="animalTypeFilter" class="form-label">Animal Type:</label>
+            <select id="animalTypeFilter" class="form-control" name="filter_type">
+                <option value="all" {% if filter_type == "all" %}selected{% endif %}>All</option>
+                <option value="M" {% if filter_type == "M" %}selected{% endif %}>Mutton</option>
+                <option value="B" {% if filter_type == "B" %}selected{% endif %}>Beef</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="usernameInput" class="form-label">Search by Username:</label>
+            <input type="text" id="usernameInput" class="form-control" placeholder="Username" value="{{ username_query }}">
+        </div>
+        <div class="col-md-2">
+            <label for="batchNoInput" class="form-label">Search by Batch No:</label>
+            <input type="text" id="batchNoInput" class="form-control" placeholder="Batch No" value="{{ batch_no_query }}">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary" onclick="fetchData()">Search</button>
+        </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" class="form-control">
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <a id="exportCsvBtn" class="btn btn-success" href="#">Download CSV</a>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Confirmation ID</th>
+                    <th>Batch Number</th>
+                    <th>No. of Animals</th>
+                    <th>Animal Type</th>
+{#                    <th>Total Amount</th>#}
+{#                    <th>Offal Collector</th>#}
+{#                    <th>Price</th>#}
+{#                    <th>Total Tags</th>#}
+                    <th>Total Prints</th>
+                    <th>Username</th>
+                    <th>Confirmed At</th>
+                    <th>Action</th>
+                    <th>Print On-Roll</th>
+                    <th>Hide IDs</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                {% for tag in data %}
+                <tr>
+                    <td>{{ tag.s_no }}</td>
+                    <td>{{ tag.batch_no }}</td>
+                    <td>{{ tag.total_animals }}</td>
+                    <td>{{ tag.product_code }}</td>
+{#                    <td>{{ tag.rate }}</td>#}
+{#                    <td>{{ tag.offal_collector }}</td>#}
+{#                    <td>{{ tag.price }}</td>#}
+{#                    <td>{{ tag.total_tags }}</td>#}
+                    <td>{{ tag.total_prints }}</td>
+                    <td>{{ tag.owner_name }}</td>
+                    <td>{{ tag.datetime }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'generate_tags' confirmation_id=tag.s_no %}">
+                            {% csrf_token %}
+                            <button type="submit" {% if tag.tags_generated %}disabled{% endif %}>
+                                Generate Tags
+                            </button>
+                        </form>
+                    </td>
+                    
+                    <td>
+                        <form method="POST" action="{% url 'print_tags' confirmation_id=tag.s_no %}" target="_blank">
+                            {% csrf_token %}
+                            <button class="print-btn" {% if not tag.tags_generated %}disabled{% endif %}>
+                                🖨️ Print
+                            </button>
+                        </form>
+                    </td>                                        
+                    <td>
+                      {% if tag.tags_generated and tag.tag_ids %}
+                      <div class="dropdown">
+                        <div class="btn-group">
+                          <button
+                            class="btn btn-outline-dark dropdown-toggle selected-tag-btn"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            {{ tag.tag_ids.0 }}
+                          </button>
+                          <button class="btn btn-outline-secondary copy-btn" type="button" title="Copy Tag">
+                            <i class="fas fa-copy"></i>
+                          </button>
+                          <ul class="dropdown-menu">
+                            {% for tid in tag.tag_ids %}
+                            <li><a class="dropdown-item tag-option" href="#">{{ tid }}</a></li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                      </div>
+                      {% else %}
+                      <span class="text-muted">Not available</span>
+                      {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="13" class="text-center">No records found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function fetchData() {
+        var selectedDate = document.getElementById("datePicker").value;
+        var filterType = document.getElementById("animalTypeFilter").value;
+        var username = document.getElementById("usernameInput").value;
+        var batchNo = document.getElementById("batchNoInput").value;
+        var queryParams = `?date=${selectedDate}&filter_type=${filterType}&username=${encodeURIComponent(username)}&batch_no=${encodeURIComponent(batchNo)}`;
+        window.location.href = queryParams;
+    }
+</script>
+<script>
+    document.querySelectorAll("form").forEach(form => {
+        form.addEventListener("submit", function(event) {
+            let button = this.querySelector("button[type='submit']");
+            if (button.id.startsWith("generate-btn")) {
+                button.disabled = true;  // Disable Generate button immediately
+                let printButton = document.getElementById("print-btn-" + button.id.split("-")[2]);
+                if (printButton) {
+                    printButton.disabled = false;  // Enable Print button
+                }
+            }
+        });
+    });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".tag-option").forEach(function (item) {
+      item.addEventListener("click", function (e) {
+        e.preventDefault();
+        const selectedText = this.textContent;
+        const dropdownBtn = this.closest(".btn-group").querySelector(".selected-tag-btn");
+        dropdownBtn.textContent = selectedText;
+      });
+    });
+
+    document.querySelectorAll(".copy-btn").forEach(function (copyBtn) {
+      copyBtn.addEventListener("click", function () {
+        const tagText = this.closest(".btn-group").querySelector(".selected-tag-btn").textContent;
+        navigator.clipboard.writeText(tagText).then(function () {
+          alert("Copied: " + tagText);
+        }, function (err) {
+          alert("Failed to copy: " + err);
+        });
+      });
+    });
+  });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const exportBtn = document.getElementById("exportCsvBtn");
+
+    exportBtn.addEventListener("click", function (e) {
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+
+      if (!startDate || !endDate) {
+        alert("Please select both start and end dates.");
+        e.preventDefault();  // Stop the link from being followed
+        return;
+      }
+
+      // Update the href of the link dynamically
+      this.href = `/export-tags/?start_date=${startDate}&end_date=${endDate}`;
+    });
+  });
+</script>
+
+{% endblock %}

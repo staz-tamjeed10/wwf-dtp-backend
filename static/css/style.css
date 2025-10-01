@@ -1,0 +1,45 @@
+
+        body {
+            background: linear-gradient(to right, red, skyblue);
+            color: #000;
+        }
+        .navbar {
+            background: linear-gradient(to right, red, skyblue);
+        }
+        .navbar a {
+            color: #0072ff;
+        }
+        .form-container {
+            background-color: skyblue;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-family: 'Arial', sans-serif;
+        }
+        .form-container label {
+            font-weight: bold;
+        }
+        .form-container input {
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .btn-primary {
+            background-color: #0072ff;
+            border: none;
+            border-radius: 5px;
+            padding: 0.5rem 2rem;
+        }
+        .btn-primary:hover {
+            background-color: #005bb5;
+        }
+
+.profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+}

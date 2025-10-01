@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+{% block title %}Garment Products{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-bg: #192752;
+        --secondary-bg: #F8CE9F;
+        --accent-color: #723B18;
+        --text-light: #ecf0f1;
+    }
+
+    .container {
+        padding: 2rem 15px;
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+    .product-card {
+        background: var(--primary-bg);
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin: 1rem 0;
+        overflow: hidden;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .qr-section {
+        padding: 1.5rem;
+        background: var(--primary-bg);
+        text-align: center;
+        border-bottom: 3px solid var(--secondary-bg);
+    }
+
+    .qr-image {
+        width: 100%;
+        max-width: 200px;
+        height: auto;
+        border: 2px solid var(--secondary-bg);
+        border-radius: 8px;
+        padding: 5px;
+    }
+
+    .product-details {
+        padding: 1.5rem;
+        color: var(--secondary-bg);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-custom {
+        background: var(--secondary-bg);
+        color: var(--primary-bg);
+        border: 2px solid transparent;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background: var(--primary-bg);
+        color: var(--secondary-bg);
+        border-color: var(--secondary-bg);
+        text-decoration: none;
+    }
+
+    .tag-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .admin-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--secondary-bg);
+        color: var(--primary-bg);
+        border: 2px solid var(--primary-bg) ;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+    .badge {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--secondary-bg) !important;
+        color: var(--primary-bg) !important;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 0;
+        color: var(--primary-bg);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1200px) {
+        .product-card {
+            max-width: 100%;
+        }
+        .product-title {
+            font-size: 1.2rem;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .qr-image {
+            max-width: 180px;
+        }
+        .product-meta p {
+            font-size: 0.95rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+        .product-card {
+            margin: 0.5rem 0;
+            border-radius: 12px;
+        }
+        .qr-image {
+            max-width: 150px;
+            padding: 3px;
+        }
+        .product-details {
+            padding: 1rem;
+        }
+        .action-buttons {
+            flex-direction: column;
+        }
+        .btn-custom {
+            width: 100%;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .qr-image {
+            max-width: 120px;
+        }
+        .product-title {
+            font-size: 1rem;
+        }
+        .badge {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+        }
+        .tag-container {
+            gap: 0.3rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .qr-image {
+            max-width: 100px;
+        }
+        .product-details {
+            padding: 0.8rem;
+        }
+        .btn-custom {
+            padding: 0.3rem 0.6rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <h2 class="text-center mb-4" style="color: var(--primary-bg);">
+        <i class="fas fa-qrcode"></i> QR Codes Generate
+    </h2>
+    <!-- Search Form -->
+    <form method="get" class="mb-5">
+        <div class="input-group">
+            <input type="text"
+                   name="search"
+                   class="form-control"
+                   placeholder="Search by Garment ID or Tag ID"
+                   value="{{ search_query }}">
+            <div class="input-group-append">
+                <button class="btn btn-custom" type="submit">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Product Grid -->
+    <div class="row">
+        {% for product in page_obj %}
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4">
+            <div class="product-card">
+                {% if is_admin %}
+                <div class="admin-badge">
+                    {{ product.user.username }}
+                </div>
+                {% endif %}
+                <div class="qr-section">
+                    {% if product.qr_code %}
+                    <img src="data:image/png;base64,{{ product.qr_code }}"
+                         class="qr-image"
+                         alt="QR Code for {{ product.garment_id }}">
+                    {% else %}
+                    <div class="text-danger">
+                        <i class="fas fa-exclamation-circle"></i> QR Error
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="product-details">
+                    <h5 class="product-title" style="text-align: center;"><strong> {{ product.garment_id }} </strong></h5>
+                    <div class="product-meta">
+                        <p><strong>Brand:</strong> {{ product.brand|default:"-" }}</p>
+                        <p><strong>Pieces:</strong> {{ product.num_pieces }}</p>
+                        <p><strong>Product Types:</strong><small>
+                        {{ product.get_product_types_list|join:", " }}
+                        {% if product.other_product_type %}
+                            ({{ product.other_product_type }})
+                        {% endif %}</small>
+                    </p>
+
+                        <p><strong>Component Leather Tags:</strong></p>
+                        <div class="tag-container">
+                            {% for tag in product.tags.all %}
+                            <span class="badge">
+                                <i class="fas fa-tag"></i> {{ tag.new_tag }}
+                            </span>
+                            {% empty %}
+                            <span class="text-muted">No tags associated</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="{% url 'print_garment_qr' product.garment_id %}"
+                           class="btn btn-custom"
+                           target="_blank">
+                            <i class="fas fa-print"></i> Print
+                        </a>
+                        <a href="{% url 'garment_detail' product.garment_id %}"
+                           class="btn btn-custom">
+                            <i class="fas fa-info-circle"></i> Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-box-open fa-3x mb-3"></i>
+                <h3>No Products Found</h3>
+                {% if search_query %}
+                <p>No results for "{{ search_query }}"</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1&search={{ search_query }}">&laquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}">&lsaquo;</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+            <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}&search={{ search_query }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}">&rsaquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}">&raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<script>
+    // Auto-dismiss alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(alert => {
+                new bootstrap.Alert(alert).close();
+            });
+        }, 5000);
+    });
+
+    // Responsive layout adjustments
+    function adjustLayout() {
+        const screenWidth = window.innerWidth;
+        const qrImages = document.querySelectorAll('.qr-image');
+
+        if(screenWidth < 768) {
+            qrImages.forEach(img => {
+                img.style.maxWidth = '140px';
+            });
+        } else {
+            qrImages.forEach(img => {
+                img.style.maxWidth = '200px';
+            });
+        }
+    }
+
+    // Initial adjustment
+    adjustLayout();
+
+    // Adjust on window resize
+    window.addEventListener('resize', adjustLayout);
+</script>
+{% endblock %}

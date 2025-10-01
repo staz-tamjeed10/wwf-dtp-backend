@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-bg: #192752;
+        --secondary-bg: #F8CE9F;
+        --accent-color: #723B18;
+        --error-color: #ff6b6b;
+        --transition-time: 0.3s;
+        --input-text: #2D1A0F;
+        --text-light: #F8CE9F;
+    }
+
+    .login-container {
+        background-color: var(--secondary-bg);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        display: grid;
+        place-items: center;
+    }
+
+    .auth-card {
+        background-color: var(--primary-bg);
+        color: var(--text-light);
+        border-radius: 1.5rem;
+        max-width: 500px;
+        width: 95%;
+        margin: 0 auto;
+        box-shadow: 0 10px 30px rgba(25, 39, 82, 0.2);
+        animation: formEntrance 0.6s ease-out;
+    }
+
+    .form-control {
+        background-color: rgba(248, 206, 159, 0.15);
+        border: 2px solid var(--secondary-bg);
+        color: var(--input-text);
+        transition: all var(--transition-time) ease;
+        min-height: 45px;
+    }
+
+    .form-control:focus {
+        background-color: rgba(248, 206, 159, 0.25);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 0.25rem rgba(114, 59, 24, 0.25);
+        color: var(--secondary-bg);
+        transform: translateY(-2px);
+    }
+
+    .input-group-text {
+        background-color: var(--secondary-bg);
+        border: 2px solid var(--secondary-bg);
+        color: var(--primary-bg);
+    }
+
+    .btn-primary {
+        background-color: var(--secondary-bg);
+        color: var(--accent-color);
+        font-weight: 600;
+        transition: all var(--transition-time) ease;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #f5b97a;
+        transform: translateY(-3px);
+    }
+
+    .invalid-feedback {
+        color: var(--error-color);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .text-link {
+        color: var(--secondary-bg);
+        text-decoration: underline;
+        transition: opacity var(--transition-time) ease;
+    }
+
+    .text-link:hover {
+        opacity: 0.8;
+    }
+
+    .auth-header {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .auth-subtitle {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: var(--text-light);
+        opacity: 0.9;
+        display: grid;
+        grid-template-columns: minmax(auto, 600px);
+        justify-content: center;
+    }
+
+    @keyframes formEntrance {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .auth-card {
+            border-radius: 1rem;
+            box-shadow: none;
+        }
+        
+        .form-control {
+            font-size: 16px;
+            min-height: 50px;
+        }
+        
+        .auth-subtitle {
+            font-size: 0.95rem;
+            white-space: normal;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .auth-subtitle {
+            font-size: 0.9rem;
+            letter-spacing: -0.05px;
+        }
+    }
+</style>
+
+<div class="login-container">
+    <div class="auth-card">
+        <div class="card-body p-3 p-md-5">
+            <div class="auth-header">
+                <h2 class="fw-bold mb-2">Login</h2>
+                <div class="auth-subtitle">
+                    Login to your account and continue where you left off.
+                </div>
+            </div>
+
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+
+                <!-- Email Field -->
+                <div class="mb-4">
+                    <label class="form-label text-light">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text rounded-start-4">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        {{ form.email|add_class:"form-control shadow-sm rounded-end-4" }}
+                    </div>
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.email.errors|striptags }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-4">
+                    <label class="form-label text-light">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text rounded-start-4">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        {{ form.password|add_class:"form-control shadow-sm rounded-end-4" }}
+                    </div>
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.password.errors|striptags }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if messages %}
+                    <div class="alert alert-danger text-center mt-3" role="alert">
+                        {% for message in messages %}
+                            {{ message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 mt-4">
+                    Login
+                </button>
+            </form>
+
+            <div class="text-center mt-4" >
+                <p class="text-light opacity-75 mb-2">
+                    Don’t have an account?
+                    <a href="{% url 'register' %}" class="text-link" style="color: var(--secondary-bg) !important;">Register here</a>
+                </p>
+                <p class="mb-0">
+                    <a href="{% url 'password_reset' %}" class="text-link" style="color: var(--secondary-bg) !important;">
+                        Forgot your password?
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Input field animations
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', () => {
+            input.parentElement.style.transform = 'translateY(-2px)';
+        });
+        input.addEventListener('blur', () => {
+            input.parentElement.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

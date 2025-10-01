@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --primary-bg: #F8CE9F;
+    --secondary-bg: #192752;
+    --accent-color: #723B18;
+    --text-dark: #192752;
+    --text-light: #F8CE9F;
+  }
+
+  body {
+    background-color: var(--primary-bg);
+    color: var(--accent-color);
+    font-family: 'Roboto', sans-serif;
+    overflow-x: hidden;
+  }
+
+  .animated-heading {
+    animation: zoomIn 1.2s ease-in-out;
+  }
+
+  @keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .focus-area {
+    background-color: var(--primary-bg);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    padding: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .focus-area.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .focus-area:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .custom-form {
+    background-color: var(--primary-bg);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .custom-form:hover {
+    background-color: var(--secondary-bg);
+    color: var(--text-light);
+  }
+
+  .title {
+    font-size: clamp(1.5rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.2;
+    margin: 1rem 0;
+    position: relative;
+    padding-bottom: 0.5rem;
+  }
+
+  .title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: var(--accent-color);
+    animation: underlineGrow 1s ease-out forwards;
+  }
+
+  @keyframes underlineGrow {
+    from { width: 0; }
+    to { width: 60px; }
+  }
+
+  .single-line-text {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    margin: 1.5rem 0;
+  }
+
+  .single-line-text a {
+    color: var(--text-dark);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .single-line-text a:hover {
+    color: var(--secondary-bg);
+    text-decoration: underline;
+  }
+
+  @media (max-width: 992px) {
+    .focus-area {
+      min-height: 240px;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .title {
+      font-size: 2rem;
+    }
+
+    .focus-area {
+      min-height: auto;
+      margin-bottom: 1rem;
+    }
+
+    .custom-form {
+      padding: 1rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .title {
+      font-size: 1.75rem;
+    }
+
+    .single-line-text {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  .scroll-animation {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+  }
+
+  .scroll-animation.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+
+<div class="container py-4 py-lg-5">
+  <div class="text-center mb-4 mb-lg-5 animated-heading">
+    <h1 class="title">Welcome to the Digital Traceability Platform</h1>
+    <h2 class="h5 font-weight-semibold mb-3" style="color:#192752;) ;">"Pakistan's Leather Sector: Traceability, Cleaner Production, and Circularity" Project</h2>
+    <h3 class="h6 font-weight-semibold mb-2" style="color:#192752;">under Sustainable Manufacturing and Environmental Pollution (SMEP) Programme funded by the UK International Development</h3>
+  </div>
+
+  <div class="mb-4 mb-lg-5 scroll-animation">
+    <p>The leather sector plays a pivotal role in Pakistan’s economy, standing as the third-largest export industry and contributing around <strong>5% to the national GDP</strong>. It provides livelihoods to over a million people. However, this essential industry faces significant environmental challenges, including hazardous waste, chemical pollution, and the absence of traceability within the value chain to ensure responsible sourcing practices.</p>
+
+    <p>As global markets increasingly demand sustainable and ethically sourced products, Pakistan’s leather sector must embrace innovative approaches to reduce its environmental footprint and enhance transparency across its operations.</p>
+
+    <p>Our project, a collaborative effort led by <strong>WWF-Pakistan</strong> and partners including Punjab Agriculture & Meat Company (<strong>PAMCO</strong>), Pakistan Council of Scientific & Industrial Research (<strong>PCSIR</strong>), Information Technology University (<strong>ITU</strong>), and <strong>Leather Field Pvt Ltd.</strong>, is pioneering solutions to transform the leather industry.</p>
+  </div>
+
+  <div class="mb-5 scroll-animation">
+    <h3 class="h6 font-weight-bold mb-4 text-center" style="color:#192752;">To address these issues, WWF-Pakistan, in collaboration with partners, is driving innovation through these three pilot work packages:</h3>
+    <div class="row">
+      <div class="col-lg-4 mb-4">
+        <div class="focus-area">
+          <h4 class="h6 text-center font-weight-bold mb-3" style="color:#192752;">Traceability</h4>
+          <p class="text-center">Develop and implement a digital traceability toolkit to track leather hides from direct suppliers to factories, increasing transparency, meeting international standards, and fostering trust within the value chain.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-4 mb-4">
+        <div class="focus-area">
+          <h4 class="h6 text-center font-weight-bold mb-3" style="color:#192752;">Circularity</h4>
+          <p class="text-center">Recycle waste from leather processing, such as trimmings, fleshing, and shavings, by converting it into water-resistant surfactants. This supports sustainable practices and reduces waste.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-4 mb-4">
+        <div class="focus-area">
+          <h4 class="h6 text-center font-weight-bold mb-3" style="color:#192752;">Cleaner Production</h4>
+          <p class="text-center">Reduce wastewater pollution by introducing lipase enzymes to replace harmful commercial agents and toxic organic solvents, improving environmental and worker safety.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center scroll-animation">
+    <p class="single-line-text">
+      For more information, visit:
+      <a href="https://www.wwfpak.org/our_work_/water_/smep_tanneries/">SMEP Tanneries | WWF</a>
+    </p>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    document.querySelectorAll('.scroll-animation, .focus-area').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Animate focus areas sequentially
+    document.querySelectorAll('.focus-area').forEach((el, index) => {
+      el.style.transitionDelay = `${index * 0.2}s`;
+    });
+  });
+</script>
+{% endblock %}

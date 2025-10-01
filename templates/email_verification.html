@@ -1,0 +1,19 @@
+{% autoescape off %}
+Hello {{ user.username }},
+
+Please click the link below to verify your email address:
+
+{{ protocol }}://{{ domain }}/api/auth/verify-email/{{ token }}/
+
+This link will expire in 24 hours.
+
+DEBUG INFO:
+Token: {{ token }}
+User: {{ user.username }}
+Domain: {{ domain }}
+
+If you didn't request this, please ignore this email.
+
+Thank you,
+The {{ domain }} Team
+{% endautoescape %}

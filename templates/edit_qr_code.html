@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block title %}Edit QR Code{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-bg: #192752;
+        --secondary-bg: #F8CE9F;
+        --accent-color: #723B18;
+        --error-color: #ff6b6b;
+        --transition-time: 0.3s;
+        --text-light: #F8CE9F;
+    }
+
+    .edit-container {
+        background-color: #F8CE9F;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+    }
+
+    .card {
+        background-color: var(--primary-bg);
+        color: var(--text-light);
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 30px rgba(25, 39, 82, 0.2);
+        margin: 1.5rem auto;
+        animation: formEntrance 0.6s ease-out;
+        max-width: 800px;
+    }
+
+    .card-header {
+        background-color: var(--secondary-bg) !important;
+        color: var(--primary-bg) !important;
+        border-radius: 1rem 1rem 0 0 !important;
+        padding: 1.25rem !important;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        background-color: rgba(248, 206, 159, 0.15);
+        border: 2px solid var(--secondary-bg);
+        color: var(--text-light);
+        transition: all var(--transition-time) ease;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus {
+        background-color: rgba(248, 206, 159, 0.25);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 0.25rem rgba(114, 59, 24, 0.25);
+        color: var(--text-light);
+    }
+
+    .input-group-text {
+        background-color: var(--secondary-bg);
+        border: 2px solid var(--secondary-bg);
+        color: var(--primary-bg);
+        padding: 0.75rem 1rem;
+    }
+
+    .btn-primary {
+        background-color: var(--secondary-bg);
+        color: var(--accent-color);
+        font-weight: 600;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        transition: all var(--transition-time) ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #f5b97a;
+        transform: translateY(-3px);
+    }
+
+    .divider-text {
+        color: var(--primary-bg);
+        position: relative;
+        text-align: center;
+        margin: 2rem 0;
+    }
+
+    .divider-text::before,
+    .divider-text::after {
+        content: "";
+        flex: 1;
+        border-bottom: 2px solid var(--secondary-bg);
+        margin: auto 1rem;
+    }
+
+    @keyframes formEntrance {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .edit-container {
+            padding: 1rem 0.5rem;
+        }
+        
+        .card {
+            border-radius: 1rem;
+            margin: 1rem auto;
+        }
+        
+        .form-control {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 0.8rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .card-header {
+            padding: 1rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.95rem;
+        }
+        
+        .input-group-text {
+            padding: 0.5rem;
+        }
+    }
+</style>
+
+<div class="edit-container">
+    <div class="container">
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+        <!-- Page Header -->
+        <div class="text-center mb-4">
+            <h2 class="fw-bold" style="color: var(--primary-bg);">
+                Edit QR Code for {{ qr_entry.owner_name }}
+            </h2>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="card shadow-sm">
+            <div class="card-body p-3 p-md-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ field.label_tag }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start-4">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            {{ field|add_class:"form-control shadow-sm rounded-end-4" }}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="text-center mt-4">
+                        <button type="submit" name="save_changes" 
+                                class="btn btn-primary rounded-pill py-2 px-4">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider-text fw-bold">
+            <span>or</span>
+        </div>
+
+        <!-- Email Form Section -->
+        <div class="card shadow-sm">
+            <div class="card-body p-3 p-md-4">
+                <h4 class="text-center mb-4 fw-bold">Send QR Code via Email</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <div class="input-group">
+                            <span class="input-group-text rounded-start-4">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                            {{ email_form.email|add_class:"form-control shadow-sm rounded-end-4" }}
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" name="send_email" 
+                                class="btn btn-primary rounded-pill py-2 px-4">
+                            Send Email
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Input field interactions
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', () => {
+            input.parentElement.style.transform = 'translateY(-2px)';
+        });
+        input.addEventListener('blur', () => {
+            input.parentElement.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Add hover effects to cards
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-5px)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

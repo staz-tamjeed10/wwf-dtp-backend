@@ -1,0 +1,660 @@
+{% extends 'base.html' %}
+
+{% block title %}SlaughterHouse Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-bg: #192752;
+        --secondary-bg: #F8CE9F;
+        --accent-color: #723B18;
+        --error-color: #ff6b6b;
+        --transition-time: 0.3s;
+        --input-text: #FFFF;
+        --text-light: #F8CE9F;
+    }
+
+    option {
+        background-color: #3A405E; /* Dark background */
+        color: white; /* White text */
+    }
+
+    .management-container {
+        background-color: var(--secondary-bg);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+    }
+
+    .profile-section {
+        background-color: var(--primary-bg);
+        color: var(--text-light);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(25, 39, 82, 0.2);
+    }
+
+    .profile-detail {
+        padding: 0.75rem 1rem;
+        margin: 0.5rem 0;
+        background-color: rgba(248, 206, 159, 0.1);
+        border-radius: 0.75rem;
+    }
+
+    .auth-card {
+        background-color: var(--primary-bg);
+        color: var(--text-light);
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 30px rgba(25, 39, 82, 0.2);
+        margin-bottom: 1.5rem;
+        animation: formEntrance 0.6s ease-out;
+    }
+
+    .card-header {
+        background-color: var(--secondary-bg) !important;
+        color: var(--primary-bg) !important;
+        border-radius: 1rem 1rem 0 0 !important;
+        padding: 1.25rem !important;
+    }
+
+    .form-control {
+        background-color: rgba(248, 206, 159, 0.15);
+        border: 2px solid var(--secondary-bg);
+        color: var(--input-text);
+        transition: all var(--transition-time) ease;
+        min-height: 45px;
+    }
+
+    .form-control:focus {
+        background-color: rgba(248, 206, 159, 0.25);
+        border-color: var(--accent-color);
+        color: var(--secondary-bg);
+        box-shadow: 0 0 0 0.25rem rgba(114, 59, 24, 0.25);
+    }
+
+    .input-group-text {
+        background-color: var(--secondary-bg);
+        border: 2px solid var(--secondary-bg);
+        color: var(--primary-bg);
+        padding: 0.75rem 1rem;
+    }
+
+    .input-group-text i {
+        color: var(--primary-bg);
+        width: 1.2rem;
+        transition: all var(--transition-time) ease;
+    }
+
+    .btn-primary {
+        background-color: var(--secondary-bg);
+        color: var(--accent-color);
+        font-weight: 600;
+        border: none;
+        transition: all var(--transition-time) ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #f5b97a;
+        transform: translateY(-3px);
+    }
+
+    .alert {
+        max-width: 800px;
+        margin: 1rem auto;
+        border-radius: 0.75rem;
+        padding: 1rem 2rem;
+        border: none;
+    }
+
+    .alert-success {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .alert-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .toast-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+
+    .toast {
+        background-color: var(--primary-bg);
+        border: 2px solid var(--error-color);
+        color: var(--text-light);
+    }
+
+    .toast-header {
+        background-color: var(--error-color);
+        color: white;
+        border-bottom: 2px solid var(--error-color);
+    }
+
+    .qr-card {
+        background-color: var(--primary-bg);
+        border-radius: 1.5rem;
+        max-width: 400px;
+        margin: 2rem auto;
+    }
+
+    .qr-image {
+        border: 2px solid var(--secondary-bg);
+        border-radius: 1rem;
+        padding: 0.5rem;
+    }
+
+    @keyframes formEntrance {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .management-container {
+            padding: 1rem 0.5rem;
+        }
+        
+        .auth-card {
+            border-radius: 1rem;
+        }
+        
+        .form-control {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .card-header {
+            padding: 1rem !important;
+        }
+        
+        .btn-primary {
+            width: 100%;
+        }
+    }
+    /* Enhanced Toast System */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    .toast {
+        background-color: var(--secondary-bg);
+        border: 2px solid var(--primary-bg);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        color: var(--primary-bg);
+        margin-bottom: 1rem;
+    }
+
+    .toast-header {
+        background-color: var(--primary-bg);
+        color: var(--secondary-bg);
+        border-bottom: 2px solid var(--primary-bg);
+        padding: 0.75rem 1rem;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .toast-body {
+        padding: 1rem;
+        font-size: 0.925rem;
+    }
+
+    .btn-close {
+        filter: invert(1);
+        padding: 0.5rem;
+        margin-left: auto;
+    }
+
+    /* Responsive Handling */
+    @media (max-width: 768px) {
+        .toast-container {
+            top: 10px;
+            right: 10px;
+            left: 10px;
+            max-width: none;
+        }
+
+        .toast {
+            width: calc(100% - 20px);
+            margin: 0 auto 1rem;
+        }
+    }
+
+    /* Animations */
+    @keyframes toastIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes toastInMobile {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .toast.show {
+        animation: toastIn 0.3s ease-out;
+    }
+
+    @media (max-width: 576px) {
+        .toast.show {
+            animation: toastInMobile 0.3s ease-out;
+        }
+    }
+</style>
+
+    
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <!-- Form Errors -->
+    {% if form.errors %}
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="toast-header">
+            <strong class="me-auto">
+                <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                Validation Errors
+            </strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <ul class="list-unstyled mb-0">
+                {% for field, errors in form.errors.items %}
+                <li class="mb-2">
+                    <div class="fw-bold">
+                        <i class="bi bi-arrow-right-circle-fill me-2"></i>
+                        {{ field|capfirst }}
+                    </div>
+                    <ul class="mb-0 ps-3">
+                        {% for error in errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- System Messages -->
+    {% if messages %}
+    {% for message in messages %}
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+        <div class="toast-header">
+            <strong class="me-auto">
+                <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill
+                          {% elif message.tags == 'error' %}bi-x-circle-fill
+                          {% else %}bi-info-circle-fill{% endif %} me-2"></i>
+                {{ message.tags|title }}
+            </strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            {{ message }}
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+<div class="management-container">
+    <div class="container">
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <h2 class="mb-4 text-center">Slaughter House Data Entry</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="profile-detail">
+                        <strong>Username:</strong> {{ user.username }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Email:</strong> {{ user.email }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Role:</strong> {{ user.profile.role|title }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Business Type:</strong> {{ business_type }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="profile-detail">
+                        <strong>Operation Type:</strong> {{ operation_type }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Animal Types:</strong> {{ animal_types }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Leather Types:</strong> {{ leather_types }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>City:</strong> {{ city }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="profile-detail">
+                        <strong>Address:</strong> {{ location }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Certifications:</strong> {{ certifications }}
+                    </div>
+                    <div class="profile-detail">
+                        <strong>Last Login:</strong> {{ user.last_login|date:"M d, Y h:i A" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Manual Data Entry Form -->
+            <div class="col-12 col-lg-6">
+                <div class="auth-card">
+                    <div class="card-header">
+                        <h6>Manual Data Entry</h6>
+                    </div>
+                    <div class="card-body p-3 p-md-4">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                           <div class="mb-3">
+                                <label class="form-label text-light mb-1">Hide/Skin Tag ID</label>
+                                <div class="input-group">
+                                    <span class="input-group-text rounded-start-4">
+                                        <i class="fas fa-tag"></i>
+                                    </span>
+                                    <input type="text" class="form-control shadow-sm rounded-end-4" style="background-color: rgba(248, 206, 159, 0.15);"
+                                           name="tag_id" value="{{ tag_id }}" readonly>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-light mb-1">Supplier Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text rounded-start-4">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                    <input type="text" class="form-control shadow-sm rounded-end-4" 
+                                           name="owner" value="{{ form.owner.value|default:'' }}" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-light mb-1">Supplier ID</label>
+                                <div class="input-group">
+                                    <span class="input-group-text rounded-start-4">
+                                        <i class="fas fa-id-card"></i>
+                                    </span>
+                                    <input type="text" class="form-control shadow-sm rounded-end-4" 
+                                           name="Supplier_id" value="{{ form.Supplier_id.value|default:'' }}" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-light mb-1">Animal Type</label>
+                                <div class="input-group">
+                                    <span class="input-group-text rounded-start-4">
+                                        <i class="fas fa-paw"></i>
+                                    </span>
+                                    <select class="form-control shadow-sm rounded-end-4" name="animal_type" required>
+                                        <option value="" disabled selected>Select Animal Type</option>
+                                        <option value="Cow">Cow</option>
+                                        <option value="Buffalo">Buffalo</option>
+                                        <option value="Sheep">Sheep</option>
+                                        <option value="Goat">Goat</option>
+                                        <option value="Camel">Camel</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-light mb-1">Slaughter Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text rounded-start-4">
+                                        <i class="fas fa-calendar-day"></i>
+                                    </span>
+                                    <input type="date" class="form-control shadow-sm rounded-end-4" 
+                                           name="slaughter_date" value="{{ form.slaughter_date.value|default:'' }}" required>
+                                </div>
+                            </div>
+
+<!-- Origin Section -->
+<div class="mb-4">
+    <label class="form-label text-light mb-1">Origin</label>
+    <div class="input-group">
+        <span class="input-group-text rounded-start-4">
+            <i class="fas fa-globe"></i>
+        </span>
+        <select class="form-control shadow-sm rounded-end-4" name="origin" id="origin-select" required>
+            <option value="" disabled {% if not form_data.origin %}selected{% endif %}>Select Origin</option>
+            <option value="Lahore" {% if form_data.origin == 'Lahore' %}selected{% endif %}>Lahore</option>
+            <option value="Kasur" {% if form_data.origin == 'Kasur' %}selected{% endif %}>Kasur</option>
+            <option value="Other" {% if form_data.origin == 'Other' %}selected{% endif %}>Other</option>
+        </select>
+    </div>
+</div>
+
+<!-- Manual Origin Input -->
+<div class="mb-4" id="other-origin-container" 
+     style="display: {% if form_data.origin == 'Other' %}block{% else %}none{% endif %};">
+    <label class="form-label text-light mb-1">Specify Origin</label>
+    <div class="input-group">
+        <span class="input-group-text rounded-start-4">
+            <i class="fas fa-pencil-alt"></i>
+        </span>
+        <input type="text" 
+               class="form-control shadow-sm rounded-end-4" 
+               name="other_origin" 
+               id="other-origin-input" 
+               placeholder="Enter origin"
+               value="{% if form_data.origin == 'Other' %}{{ form_data.other_origin|default:'' }}{% endif %}"
+               {% if form_data.origin == 'Other' %}required{% endif %}>
+    </div>
+</div>
+                            
+                            <script>
+                                document.getElementById("origin-select").addEventListener("change", function() {
+                                    var otherOriginContainer = document.getElementById("other-origin-container");
+                                    if (this.value === "Other") {
+                                        otherOriginContainer.style.display = "block";
+                                    } else {
+                                        otherOriginContainer.style.display = "none";
+                                    }
+                                });
+                            </script>
+                            
+
+                            <button type="submit" name="manual_data_entry" 
+                                    class="btn btn-primary w-100 rounded-pill py-2">
+                                Submit
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Track Tag Information Section -->
+            <div class="col-12 col-lg-6">
+                <div class="auth-card">
+                    <div class="card-header">
+                        <h6>Track Tag Information</h6>
+                    </div>
+                    <div class="card-body p-3 p-md-4">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label class="form-label text-light mb-1">Hide/Skin Tag ID</label>
+                                <div class="input-group">
+                                    <span class="input-group-text rounded-start-4">
+                                        <i class="fas fa-qrcode"></i>
+                                    </span>
+                                    <input type="text" class="form-control shadow-sm rounded-end-4" 
+                                           name="tag_id" placeholder="Enter Hide/Skin Tag ID" required>
+                                </div>
+                            </div>
+                            <button type="submit" name="fetch_tag_data" 
+                                    class="btn btn-primary w-100 rounded-pill py-2">
+                                Fetch Tag Data
+                            </button>
+                        </form>
+
+                        {% if fetched_info %}
+                        <div class="auth-card mt-4">
+                            <div class="card-header">
+                                <h6>Fetched Information</h6>
+                            </div>
+                            <div class="card-body p-3">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="tag_id" value="{{ fetched_info.tag_id }}">
+
+<div class="row g-2 mb-3">
+    <div class="col-12 col-md-6">
+        <label class="form-label text-light mb-1">Supplier Name</label>
+        <input type="text" class="form-control bg-transparent text-light" 
+               value="{{ fetched_info.owner }}" readonly>
+        <input type="hidden" name="owner" value="{{ fetched_info.owner }}">
+    </div>
+    <div class="col-12 col-md-6">
+        <label class="form-label text-light mb-1">Supplier ID</label>
+        <input type="text" class="form-control bg-transparent text-light" 
+               value="{{ fetched_info.Supplier_id }}" readonly>
+        <input type="hidden" name="Supplier_id" value="{{ fetched_info.Supplier_id }}">
+    </div>
+</div>
+
+<div class="row g-2 mb-3">
+    <div class="col-12">
+        <label class="form-label text-light mb-1">Slaughter Date</label>
+        <input type="date" class="form-control bg-transparent text-light" 
+               value="{{ fetched_info.slaughter_date }}" readonly>
+        <input type="hidden" name="slaughter_date" value="{{ fetched_info.slaughter_date }}">
+    </div>
+</div>
+
+                                    <button type="submit" name="transfer_to_manual" 
+                                            class="btn btn-primary w-100 rounded-pill py-2">
+                                        Transfer to Manual Form
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code Section -->
+        {% if qr_code %}
+        <div class="auth-card qr-card mt-4">
+            <div class="card-body text-center p-4">
+                <h5 class="fw-bold mb-3">Generated QR Code</h5>
+                <p class="text-light opacity-75 mb-4">
+                    Hide/Skin Tag ID: {{ hd_instance.animal_id }}<br>
+                    Scan to access details
+                </p>
+                <img src="data:image/png;base64,{{ qr_code }}" 
+                     alt="QR Code" 
+                     class="img-fluid qr-image mb-3">
+                <a href="data:image/png;base64,{{ qr_code }}" 
+                   download="QR_Code.png" 
+                   class="btn btn-primary rounded-pill px-4">
+                   <i class="fas fa-download me-2"></i>Download QR
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<script>
+// Initialize form state on load
+document.addEventListener('DOMContentLoaded', function() {
+    const originSelect = document.getElementById("origin-select");
+    const otherContainer = document.getElementById("other-origin-container");
+    const otherInput = document.getElementById("other-origin-input");
+
+    // Set initial state from server-side data
+    const initialOrigin = "{{ form_data.origin|default:'' }}";
+    if (initialOrigin === 'Other') {
+        otherContainer.style.display = "block";
+        otherInput.required = true;
+    }
+
+    // Handle dynamic changes
+    originSelect.addEventListener("change", function() {
+        if (this.value === "Other") {
+            otherContainer.style.display = "block";
+            otherInput.required = true;
+        } else {
+            otherContainer.style.display = "none";
+            otherInput.required = false;
+            otherInput.value = "";
+        }
+    });
+
+    // Initialize select value from form_data
+    if (initialOrigin) {
+        originSelect.value = initialOrigin;
+    }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all toasts
+    const initializeToasts = () => {
+        const toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        toastElList.forEach(toastEl => {
+            const options = {
+                autohide: toastEl.dataset.bsAutohide !== "false",
+                delay: toastEl.dataset.bsDelay ? parseInt(toastEl.dataset.bsDelay) : 5000
+            }
+            const toast = new bootstrap.Toast(toastEl, options)
+            toast.show()
+            
+            // Auto-hide form error toast after 15 seconds
+            if (toastEl.dataset.bsAutohide === "false") {
+                setTimeout(() => toast.hide(), 15000)
+            }
+        })
+    }
+
+    // Handle responsive layout changes
+    const handleResponsiveLayout = () => {
+        const toastContainer = document.querySelector('.toast-container')
+        if (window.innerWidth < 768) {
+            toastContainer.classList.add('position-relative')
+            toastContainer.classList.remove('position-fixed', 'top-0', 'end-0')
+        } else {
+            toastContainer.classList.remove('position-relative')
+            toastContainer.classList.add('position-fixed', 'top-0', 'end-0')
+        }
+    }
+
+    // Initial setup
+    initializeToasts()
+    handleResponsiveLayout()
+
+    // Update on window resize
+    window.addEventListener('resize', handleResponsiveLayout)
+
+    // Close all toasts when clicking outside (mobile only)
+    if (window.innerWidth < 768) {
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.toast')) {
+                const toasts = bootstrap.Toast.getAllInstances()
+                toasts.forEach(toast => toast.hide())
+            }
+        })
+    }
+})
+</script>
+{% endblock %}

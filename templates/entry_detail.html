@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Entry Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="form-container">
+                <h2 class="text-center">Your Details</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" value="{{ entry.name }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" value="{{ entry.email }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" class="form-control" id="phone" value="{{ entry.phone }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea class="form-control" id="address" readonly>{{ entry.address }}</textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Form Container Animation */
+    .form-container {
+        animation: fadeIn 0.7s ease-in;
+    }
+
+    /* Form Headers */
+    h2 {
+        color: #00796B;
+        margin-bottom: 20px;
+    }
+
+    /* Input Styling */
+    .form-control {
+        background-color: #FAFAFA;
+        border-color: #B2DFDB;
+        color: #212121;
+    }
+
+    .form-control:focus {
+        border-color: #00796B;
+        box-shadow: 0 0 5px rgba(0, 121, 107, 0.5);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-bg: #192752;
+        --secondary-bg: #F8CE9F;
+        --accent-color: #723B18;
+        --text-light: #F8CE9F;
+        --transition-time: 0.3s;
+    }
+
+    .profile-container {
+        background-color: var(--secondary-bg);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile-card {
+        background-color: var(--primary-bg);
+        color: var(--text-light);
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 30px rgba(25, 39, 82, 0.2);
+        animation: formEntrance 0.6s ease-out;
+        max-width: 600px;
+        width: 100%;
+        padding: 2rem;
+        transition: transform var(--transition-time) ease;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .profile-icon {
+        width: 120px;
+        height: 120px;
+        background-color: var(--secondary-bg);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        transition: all var(--transition-time) ease;
+    }
+
+    .profile-icon i {
+        font-size: 4rem;
+        color: var(--primary-bg);
+    }
+
+    .profile-detail {
+        padding: 0.75rem 1rem;
+        margin: 0.5rem 0;
+        background-color: rgba(248, 206, 159, 0.1);
+        border-radius: 0.75rem;
+        transition: all var(--transition-time) ease;
+    }
+
+    .profile-detail:hover {
+        background-color: rgba(248, 206, 159, 0.15);
+        transform: translateX(5px);
+    }
+
+    .btn-edit {
+        background-color: var(--secondary-bg);
+        color: var(--primary-bg);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all var(--transition-time) ease;
+    }
+
+    .btn-edit:hover {
+        background-color: #f5b97a;
+        transform: translateY(-3px);
+    }
+
+    @keyframes formEntrance {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            padding: 1rem;
+        }
+
+        .profile-card {
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+
+        .profile-icon {
+            width: 100px;
+            height: 100px;
+        }
+
+        .profile-icon i {
+            font-size: 3rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .profile-detail {
+            font-size: 0.9rem;
+            padding: 0.6rem 0.8rem;
+        }
+
+        .btn-edit {
+            width: 100%;
+            padding: 0.75rem;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    <div class="profile-card shadow-lg">
+        <div class="card-body">
+            <!-- Profile Icon -->
+            <div class="profile-icon">
+                <i class="fas fa-user-circle"></i>
+            </div>
+
+            <!-- Title -->
+            <div class="text-center mb-4">
+                <h2 class="fw-bold mb-3">Your Profile</h2>
+                <p class="opacity-75">Manage your account details and settings</p>
+            </div>
+
+            <!-- Profile Details -->
+            <div class="mb-4">
+                <div class="profile-detail">
+                    <strong>Username:</strong> {{ user.username }}
+                </div>
+                <div class="profile-detail">
+                    <strong>Email:</strong> {{ user.email }}
+                </div>
+                <div class="profile-detail">
+                    <strong>Email Verified:</strong> {{ email_verified|yesno:"Yes,No" }}
+                </div>
+                <div class="profile-detail">
+                    <strong>Role:</strong>
+                    {% if user.profile.role == "slaughterhouse" %}
+                        Slaughterhouse
+                    {% elif user.profile.role == "trader" %}
+                        Trader
+                    {% elif user.profile.role == "tannery" %}
+                        Tannery
+                    {% elif user.profile.role == "garment" %}
+                        Garment
+                    {% else %}
+                        Admin
+                    {% endif %}
+                </div>
+                <div class="profile-detail">
+                    <strong>Brand:</strong> {{ user.profile.brand }}
+                </div>
+                <div class="profile-detail">
+                    <strong>Contact Number:</strong> {{ user.profile.contact_no }}
+                </div>
+                <div class="profile-detail">
+                    <strong>Business Type:</strong> {{ user.profile.business_type }}
+                </div>
+                <div class="profile-detail">
+                    <strong>Operation Type:</strong> {{ user.profile.operation_type }}
+                </div>
+                <div class="profile-detail">
+                    <strong>Animal Types:</strong> {{ user.profile.animal_types }}
+                </div>
+                <div class="profile-detail">
+                    <strong>Leather Types:</strong> {{ user.profile.leather_types }}
+                </div>
+                <div class="profile-detail">
+                    <strong>City:</strong> {{ user.profile.city }}
+                </div>
+                <div class="profile-detail">
+                    <strong>Address:</strong> {{ user.profile.location }}
+                </div>
+                <div class="profile-detail">
+                    <strong>Certifications:</strong> {{ user.profile.certifications }}
+                </div>
+            </div>
+            </div>
+
+            <!-- Edit Button -->
+            <div class="text-center mt-4">
+                <a href="{% url 'edit_profile' %}" class="btn btn-edit">
+                    <i class="fas fa-edit me-2"></i>Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effect to profile icon
+    const profileIcon = document.querySelector('.profile-icon');
+    profileIcon.addEventListener('mouseenter', () => {
+        profileIcon.style.transform = 'scale(1.05)';
+    });
+    profileIcon.addEventListener('mouseleave', () => {
+        profileIcon.style.transform = 'scale(1)';
+    });
+});
+</script>
+{% endblock %}
